@@ -1,0 +1,69 @@
+---
+title: "Final Project Pitch"
+author: "D.A. Kelome"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Objective of the App.  
+We use the dataset *iris* from the base R package and extract the columns named *Sepal.Length*, *Sepal.Width* and *Species*.  
+For reference the summaries of the three variables are displayed below;
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+summary(iris[,c(1,2,5)])
+```
+The goal of the app will be to give a prediction of *Sepal.width* given a value of *Sepal.Length* and *Species* using linear regression models by species. The app is equipped with a selection menu allowing to first read the short documentation and then proceed to using the app.
+
+ 
+
+## Configuration of the App
+
+
+- **Input Side Panel**  
+it contains check boxes to select the species, and an entry box for the value of *Sepal.Length* which will be used for the prediction(s).
+- **Output Panel**  
+The output panel has two components:
+- The upper part is a plot panel displaying the scatterplot, fitted regressions lines for the selected species (a snapshot, when all the three species are selected is given on the next slide).  
+- The lower part gives the predicted value(s) of *Sepal.Width* along with the prediction margin of error corresponding to a level .95. 
+
+## The graphics on The app.
+```{r echo=FALSE,message=FALSE,warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(patchwork)
+#d=iris[,c(1,2,5)]
+model_setos=lm(Sepal.Width~Sepal.Length,data=subset(iris,
+                                                      iris$Species=="setosa"))
+  model_virgi=lm(Sepal.Width~Sepal.Length,data=subset(iris,
+                                                      iris$Species=="virginica"))
+  model_versi=lm(Sepal.Width~Sepal.Length,data=subset(iris,
+                                                      iris$Species=="versicolor"))
+  
+ plot(iris$Sepal.Length, iris$Sepal.Width, xlab = "Sepal Length", 
+       ylab = "Sepal Width", type = 'n', xlim = c(3, 9), ylim = c(1, 7))
+  points(iris$Sepal.Length[iris$Species=="setosa"],iris$Sepal.Width[iris$Species=="setosa"],col="red",pch=15)
+  points(iris$Sepal.Length[iris$Species=="versicolor"],iris$Sepal.Width[iris$Species=="versicolor"],col="blue",pch=16)
+  points(iris$Sepal.Length[iris$Species=="virginica"],iris$Sepal.Width[iris$Species=="virginica"],col="green",pch=17)
+    abline(model_setos, col = "red", lwd = 2)
+    abline(model_versi , col = "blue", lwd = 2)
+    abline(model_virgi , col = "green", lwd = 2)
+  legend( 3, 6, c("Setosa", "Versicolor","Virginica"), pch = 19, 
+         col = c("red", "blue","green"), bty = "n", cex = 1.2)
+
+```
+
+## An example of Computation performed by the App
+ 
+Assuming that the species is Setosa and the input value for *Sepal.Length* is 5.2,   
+  
+    
+    
+- The predicted value for *sepal.Width* will be `r round(predict(model_setos, newdata = data.frame(Sepal.Length =5.2)),3)`  
+   
+   
+- The corresponding margin of error at level .95 will be `r round(predict.lm(model_setos, newdata = data.frame(Sepal.Length =5.2),se.fit=TRUE,level=0.95)$se.fit,3)`
+
